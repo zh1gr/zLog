@@ -10,8 +10,8 @@ import (
 //# Logs
 //# 0 - off
 //# 1 - errors
-//# 2 - info
-//# 3 - warnings
+//# 2 - warnings
+//# 3 - info
 //# 4 - debug (all log levels)
 
 var (
@@ -29,24 +29,6 @@ func SetTimeFormat(f string) {
 	timeFormat = f
 }
 
-func Debug(msg string, i ...interface{}) {
-	if level >= 4 {
-		fmt.Fprintf(os.Stdout, "[%s][DEBUG]: %s\n", getTimeNow(), fmt.Sprintf(msg, i...))
-	}
-}
-
-func Info(msg string, i ...interface{}) {
-	if level >= 2 {
-		fmt.Fprintf(os.Stdout, "[%s][INFO]: %s\n", getTimeNow(), fmt.Sprintf(msg, i...))
-	}
-}
-
-func Warning(msg string, i ...interface{}) {
-	if level >= 3 {
-		fmt.Fprintf(os.Stdout, "[%s][WARNING]: %s\n", getTimeNow(), fmt.Sprintf(msg, i...))
-	}
-}
-
 func Error(err interface{}, i ...interface{}) {
 	if level >= 1 {
 		switch v := err.(type) {
@@ -59,6 +41,24 @@ func Error(err interface{}, i ...interface{}) {
 		default:
 			fmt.Fprintf(os.Stderr, "[%s][ERROR]: %s\n", getTimeNow(), v)
 		}
+	}
+}
+
+func Warning(msg string, i ...interface{}) {
+	if level >= 2 {
+		fmt.Fprintf(os.Stdout, "[%s][WARNING]: %s\n", getTimeNow(), fmt.Sprintf(msg, i...))
+	}
+}
+
+func Info(msg string, i ...interface{}) {
+	if level >= 3 {
+		fmt.Fprintf(os.Stdout, "[%s][INFO]: %s\n", getTimeNow(), fmt.Sprintf(msg, i...))
+	}
+}
+
+func Debug(msg string, i ...interface{}) {
+	if level >= 4 {
+		fmt.Fprintf(os.Stdout, "[%s][DEBUG]: %s\n", getTimeNow(), fmt.Sprintf(msg, i...))
 	}
 }
 
