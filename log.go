@@ -15,22 +15,23 @@ import (
 //# 4 - debug (all log levels)
 
 var (
-	level      = 3
-	timeFormat = "2006-01-02 15:04:05.000000"
-	ERROR      = logOut{os.Stderr, "ERROR"}
-	WARNING    = logOut{os.Stdout, "WARNING"}
-	INFO       = logOut{os.Stdout, "INFO"}
-	DEBUG      = logOut{os.Stdout, "DEBUG"}
+	mainLogLevel = 3
+	timeFormat   = "2006-01-02 15:04:05.000000"
+	lERROR       = logOut{os.Stderr, "ERROR", 1}
+	lWARNING     = logOut{os.Stdout, "WARNING", 2}
+	lINFO        = logOut{os.Stdout, "INFO", 3}
+	lDEBUG       = logOut{os.Stdout, "DEBUG", 4}
 )
 
 type logOut struct {
-	Output   io.Writer
-	LogLevel string
+	Output  io.Writer
+	Caption string
+	Level   int
 }
 
 func SetLogLevel(lvl int) {
 	if lvl >= 0 && lvl < 5 {
-		level = lvl
+		mainLogLevel = lvl
 	}
 }
 
@@ -39,34 +40,26 @@ func SetTimeFormat(f string) {
 }
 
 func Error(err interface{}, i ...interface{}) {
-	if level > 0 {
-		switch v := err.(type) {
-		case error:
-			fPrintLog(ERROR, v.Error())
-		case string:
-			fPrintLog(ERROR, fmt.Sprintf(v, i...))
-		default:
-			fPrintLog(ERROR, v)
-		}
+	switch v := err.(type) {
+	case error:
+		fPrintLog(lERROR, v.Error())
+	case string:
+		fPrintLog(lERROR, fmt.Sprintf(v, i...))
+	default:
+		fPrintLog(lERROR, v)
 	}
 }
 
 func Warning(msg string, i ...interface{}) {
-	if level > 1 {
-		fPrintLog(WARNING, fmt.Sprintf(msg, i...))
-	}
+	fPrintLog(lWARNING, fmt.Sprintf(msg, i...))
 }
 
 func Info(msg string, i ...interface{}) {
-	if level > 2 {
-		fPrintLog(INFO, fmt.Sprintf(msg, i...))
-	}
+	fPrintLog(lINFO, fmt.Sprintf(msg, i...))
 }
 
 func Debug(msg string, i ...interface{}) {
-	if level > 3 {
-		fPrintLog(DEBUG, fmt.Sprintf(msg, i...))
-	}
+	fPrintLog(lDEBUG, fmt.Sprintf(msg, i...))
 }
 
 func getTimeNow() string {
@@ -74,7 +67,10 @@ func getTimeNow() string {
 }
 
 func fPrintLog(l logOut, s ...interface{}) {
-	if _, err := fmt.Fprintf(l.Output, "[%s][%s]: %s\n", getTimeNow(), l.Output, s); err != nil {
-		fPrintLog(ERROR, err)
+	if mainLogLevel <= l.Level {
+		_, err := fmt.Fprintf(l.Output, "[%s][%s]: %s\n", getTimeNow(), l.Output, s)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[%s][ERROR][LOG]: %s",getTimeNow(), err)
+		}
 	}
 }
