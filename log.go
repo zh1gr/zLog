@@ -15,8 +15,8 @@ import (
 //# 4 - debug (all log levels)
 
 var (
-	mainLogLevel = 3
-	timeFormat   = "2006-01-02 15:04:05.000000"
+	mainLogLevel = 4
+	timeFormat   = time.StampMicro
 	lERROR       = logOut{os.Stderr, "ERROR", 1}
 	lWARNING     = logOut{os.Stdout, "WARNING", 2}
 	lINFO        = logOut{os.Stdout, "INFO", 3}
@@ -67,8 +67,8 @@ func getTimeNow() string {
 }
 
 func fPrintLog(l logOut, s ...interface{}) {
-	if mainLogLevel <= l.Level {
-		_, err := fmt.Fprintf(l.Output, "[%s][%s]: %s\n", getTimeNow(), l.Output, s)
+	if mainLogLevel >= l.Level {
+		_, err := fmt.Fprintf(l.Output, "[%s][%s]: %s\n", getTimeNow(), l.Caption, s)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "[%s][ERROR][LOG]: %s",getTimeNow(), err)
 		}
