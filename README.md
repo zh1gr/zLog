@@ -1,7 +1,7 @@
 zLog
 =
 
-Some king of logs, for GoLang.
+Some kind of logs, for GoLang.
 
 Log format by default:
 
